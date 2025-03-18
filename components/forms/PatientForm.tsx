@@ -11,6 +11,8 @@ import {Form} from "@/components/ui/form"
 import CustomForm from "../ui/CustomForm"
 import SubmitButton from "../ui/SubmitButton";
 import { UserFormValidation } from '@/lib/validation';
+import { createUser } from '@/lib/actions/patient.actions';
+
 
 export enum FormFieldType {
     INPUT = 'input',
@@ -22,7 +24,7 @@ export enum FormFieldType {
 
 }
  
-const PatientForm = () => {
+export const PatientForm = () => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -39,13 +41,15 @@ async function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>
     setIsLoading(true)
 
     try {
-      // const userData = {name, email, phone}
-      // const user = await createUser(userData)
+      const userData = {name, email, phone}
+      const user = await createUser(userData)
 
-      // if(user) router.push(`/patients/${user.$id}/register`)
+      if(user) router.push(`/patients/${user.$id}/register`)
     } catch (error) {
       console.log(error)
     }
+
+    setIsLoading(false)
   }
 
   return (
@@ -62,7 +66,7 @@ async function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>
             name="name"
             label="Nome completo"
             placeholder="Bruno Silva"
-            iconSrc="../../public/assets/icons/user.svg"
+            iconSrc="/assets/icons/user.svg"
             iconAlt="user"
         />
 
@@ -72,7 +76,7 @@ async function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>
             name="email"
             label="E-mail"
             placeholder="brunosilva@exemplo.com"
-            iconSrc="../../public/assets/icons/email.svg"
+            iconSrc="/assets/icons/email.svg"
             iconAlt="email"
         />
 
