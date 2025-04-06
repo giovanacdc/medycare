@@ -43,33 +43,28 @@ export const registerPatient = async ({ identificationDocument, ...patient }: Re
     try {
         let file;
 
-        // Verifica se identificationDocument é uma instância de FormData
         if (identificationDocument && identificationDocument instanceof FormData) {
-            // Obtém o arquivo (Blob) e o nome do arquivo do FormData
             const blobFile = identificationDocument.get('blobFile') as Blob;
             const fileName = identificationDocument.get('fileName') as string;
 
-            // Verifica se os valores existem
             if (blobFile && fileName) {
-                // Cria um InputFile a partir do Blob e do nome do arquivo
                 const inputFile = InputFile.fromBuffer(blobFile, fileName);
 
-                // Faz o upload do arquivo para o Appwrite Storage
                 file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
             }
         }
 
-        // Cria o documento do paciente no banco de dados
+        
         const newPatient = await databases.createDocument(
             DATABASE_ID!,
             PATIENT_COLLECTION_ID!,
             ID.unique(),
             {
-                identificationDocumentId: file?.$id || null, // ID do arquivo no Storage
+                identificationDocumentId: file?.$id || null, 
                 identificationDocumentUrl: file
                     ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
-                    : null, // URL do arquivo no Storage
-                ...patient, // Outros dados do paciente
+                    : null, 
+                ...patient, 
             }
         );
 

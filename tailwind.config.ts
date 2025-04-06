@@ -34,6 +34,7 @@ const config = {
   				'700': '#F24E43'
   			},
   			light: {
+				'100': '#F5F5F5',
   				'200': '#E8E9E9'
   			},
   			dark: {

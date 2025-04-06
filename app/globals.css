@@ -47,7 +47,7 @@
   }
 
   .header {
-    @apply text-32-bold md:text-36-bold;
+    @apply text-32-bold md:text-36-bold text-dark-700;
   }
 
   .sub-header {
@@ -76,7 +76,7 @@
   }
 
   .request-details {
-    @apply flex w-full flex-col items-center gap-8 border-y-2 border-dark-400 py-8 md:w-fit md:flex-row;
+    @apply flex w-full flex-col items-center gap-8 border-y-2 border-light-200 py-8 md:w-fit md:flex-row text-dark-700;
   }
 
   /* ===== ADMIN */

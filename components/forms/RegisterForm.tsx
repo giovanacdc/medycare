@@ -185,8 +185,8 @@ const RegisterForm = ({ user }: { user: User }) => {
           fieldType={FormFieldType.SELECT}
           control={form.control}
           name="primaryPhysician"
-          label="teste"
-          placeholder="Selecione"
+          label="Clínico Geral"
+          placeholder="Selecione um Clínico Geral"
         >
           {Doctors.map((doctor, i) => (
             <SelectItem key={doctor.name + i} value={doctor.name}>
@@ -326,7 +326,7 @@ const RegisterForm = ({ user }: { user: User }) => {
         />
       </section>
 
-      <SubmitButton isLoading={isLoading}>Entre</SubmitButton>
+      <SubmitButton isLoading={isLoading}>Enviar</SubmitButton>
     </form>
     </Form >
   )
