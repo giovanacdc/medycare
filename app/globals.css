@@ -81,7 +81,7 @@
 
   /* ===== ADMIN */
   .admin-header {
-    @apply sticky top-3 z-20 mx-3 flex items-center justify-between rounded-2xl bg-dark-200 px-[5%] py-5 shadow-lg xl:px-12;
+    @apply sticky top-3 z-20 mx-3 flex items-center justify-between rounded-2xl bg-light-100 px-[5%] py-5 shadow-lg xl:px-12;
   }
 
   .admin-main {
@@ -112,7 +112,7 @@
 
   /* ==== Stat Card */
   .stat-card {
-    @apply flex flex-1 flex-col gap-6 rounded-2xl bg-cover p-6 shadow-lg;
+    @apply flex flex-1 flex-col gap-6 rounded-2xl bg-cover p-6 shadow-lg bg-light-100;
   }
 
   /* ==== Status Badge */
@@ -189,7 +189,7 @@
   }
 
   .shad-gray-btn {
-    @apply border border-dark-200 cursor-pointer bg-dark-400 text-white !important;
+    @apply border border-dark-100 cursor-pointer bg-light-100 !important;
   }
 
   .shad-input-label {
@@ -225,7 +225,7 @@
   }
 
   .shad-dialog {
-    @apply bg-dark-400 border-dark-500 !important;
+    @apply bg-light-100 border-dark-500 text-dark-700 !important;
   }
 
   .shad-dialog button {
@@ -241,11 +241,11 @@
   }
 
   .shad-table-row-header {
-    @apply border-b border-dark-400 text-light-200 hover:bg-transparent !important;
+    @apply border-b border-dark-100 text-dark-600 hover:bg-transparent !important;
   }
 
   .shad-table-row {
-    @apply border-b border-dark-400 text-light-200 !important;
+    @apply border-b border-dark-100 text-dark-600 !important;
   }
 
   .shad-otp {
@@ -253,11 +253,11 @@
   }
 
   .shad-otp-slot {
-    @apply text-36-bold justify-center flex border border-dark-500 rounded-lg size-16 gap-4 !important;
+    @apply text-32-bold text-purple-600 justify-center flex border border-dark-100 rounded-lg size-16 gap-4 !important;
   }
 
   .shad-alert-dialog {
-    @apply space-y-5 bg-dark-400 border-dark-500 outline-none !important;
+    @apply space-y-5 bg-light-100 border-dark-100 outline-none !important;
   }
 
   .shad-sheet-content button {

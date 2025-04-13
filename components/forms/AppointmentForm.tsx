@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
@@ -15,14 +15,17 @@ import { createUser } from '@/lib/actions/patient.actions';
 import { FormFieldType } from './PatientForm';
 import { Doctors } from '@/constants';
 import { SelectItem } from '../ui/select';
-import { createAppointment } from '@/lib/actions/appointment.actions';
+import { createAppointment, updateAppointment } from '@/lib/actions/appointment.actions';
 import { get } from 'http';
+import { Appointment } from '@/types/appwrite.types';
 
-export const AppointmentForm = ({ userId, patientId, type }:
+export const AppointmentForm = ({ userId, patientId, type = "criar", appointment, setOpen }:
     {
         userId: string
         patientId: string
-        type: "create" | "cancel" | "schedule"
+        type: "criar" | "cancelar" | "agendar"
+        appointment?: Appointment
+        setOpen?: Dispatch<SetStateAction<boolean>>
     }) => {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
@@ -32,23 +35,23 @@ export const AppointmentForm = ({ userId, patientId, type }:
     const form = useForm<z.infer<typeof AppointmentFormValidation>>({
         resolver: zodResolver(AppointmentFormValidation),
         defaultValues: {
-            primaryPhysician: "",
-            schedule: new Date(),
-            reason: "",
-            note: "",
-            cancellationReason: "",
+            primaryPhysician: appointment ? appointment.primaryPhysician : '',
+            schedule: appointment ? new Date(appointment?.schedule!) : new Date(Date.now()),
+            reason: appointment ? appointment.reason : '',
+            note: appointment?.note || '',
+            cancellationReason: appointment?.cancellationReason || '',
         },
     })
 
-    async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
+    const onSubmit = async (values: z.infer<typeof AppointmentFormValidation>) => {
         setIsLoading(true)
 
         let status
         switch (type) {
-            case 'schedule':
+            case 'agendar':
                 status = 'agendado'
                 break
-            case 'cancel':
+            case 'cancelar':
                 status = 'cancelado'
                 break
             default:
@@ -57,8 +60,8 @@ export const AppointmentForm = ({ userId, patientId, type }:
         }
 
         try {
-            if (type === 'create' && patientId) {
-                const appointmentData = {
+            if (type === 'criar' && patientId) {
+                const appointment = {
                     userId,
                     patient: patientId,
                     primaryPhysician: values.primaryPhysician,
@@ -68,11 +71,31 @@ export const AppointmentForm = ({ userId, patientId, type }:
                     note: values.note,
                 }
 
-                const appointment = await createAppointment(appointmentData)
+                const newAppointment = await createAppointment(appointment)
 
-                if (appointment) {
+                if (newAppointment) {
                     form.reset()
-                    router.push(`/patients/${userId}/new-appointment/success?appointmentId=${appointment.$id}`)
+                    router.push(`/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`)
+                }
+
+            } else {
+                const appointmentToUpdate = {
+                    userId,
+                    appointmentId: appointment?.$id!,
+                    appointment: {
+                        primaryPhysician: values.primaryPhysician,
+                        schedule: new Date(values.schedule),
+                        status: status as Status,
+                        cancellationReason: values.cancellationReason,
+                    },
+                    type,
+                }
+
+                const updatedAppointment = await updateAppointment(appointmentToUpdate);
+
+                if (updatedAppointment) {
+                    setOpen && setOpen(false);
+                    form.reset();
                 }
 
             }
@@ -86,28 +109,25 @@ export const AppointmentForm = ({ userId, patientId, type }:
     let buttonLabel;
 
     switch (type) {
-        case 'cancel':
-            buttonLabel = 'Cancelar agendamento';
+        case 'cancelar':
+            buttonLabel = 'Cancelar consulta';
             break;
-        case 'create':
-            buttonLabel = 'Criar agendamento';
-            break;
-        case 'schedule':
+        case 'agendar':
             buttonLabel = 'Agendar consulta';
             break;
         default:
-            break;
+            buttonLabel = 'Criar consulta';
     }
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
-                <section className="mb-12 space-y-4">
-                    <h1 className="header text-dark-700">Novo agendamento</h1>
-                    <p className="text-dark-600">Faça um novo agendamento</p>
-                </section>
+                {type === 'criar' && <section className="mb-12 space-y-4">
+                    <h1 className="header text-dark-700">Nova Consulta</h1>
+                    <p className="text-dark-600">Agende uma nova consulta</p>
+                </section>}
 
-                {type !== "cancel" && (
+                {type !== "cancelar" && (
                     <>
                         <CustomForm
                             fieldType={FormFieldType.SELECT}
@@ -141,13 +161,14 @@ export const AppointmentForm = ({ userId, patientId, type }:
                             dateFormat="dd/MM/yyyy - HH:mm aa"
                         />
 
-                        <div className="flex flex-col gap-6 xl:flex-row">
+                        <div className={`flex flex-col gap-6 ${type === "criar" && "xl:flex-row"}`}>
                             <CustomForm
                                 fieldType={FormFieldType.TEXTAREA}
                                 control={form.control}
                                 name="reason"
                                 label="Motivo da consulta"
                                 placeholder="Descreva o motivo da consulta"
+                                disabled={type === "agendar"}
                             />
 
                             <CustomForm
@@ -156,13 +177,14 @@ export const AppointmentForm = ({ userId, patientId, type }:
                                 name="note"
                                 label="Observações"
                                 placeholder="Descreva as observações"
+                                disabled={type === "agendar"}
                             />
                         </div>
 
                     </>
                 )}
 
-                {type === "cancel" && (
+                {type === "cancelar" && (
                     <CustomForm
                         fieldType={FormFieldType.TEXTAREA}
                         control={form.control}
@@ -174,11 +196,9 @@ export const AppointmentForm = ({ userId, patientId, type }:
 
 
 
-                <SubmitButton isLoading={isLoading} className={`${type === 'cancel' ? 'shad-danger-btn' : 'shad-primary-btn'} w-full`}>{buttonLabel}</SubmitButton>
+                <SubmitButton isLoading={isLoading} className={`${type === 'cancelar' ? 'shad-danger-btn' : 'shad-primary-btn'} w-full`}>{buttonLabel}</SubmitButton>
 
             </form>
         </Form >
     )
 }
-
-export default AppointmentForm

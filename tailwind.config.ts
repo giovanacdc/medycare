@@ -53,7 +53,11 @@ const config = {
                     ...fontFamily.sans
                 ]
   		},
-  		backgroundImage: {},
+  		backgroundImage: {
+			appointments: "url('/assets/images/Glow.png')",
+			pending: "url('/assets/images/pending-bg.png')",
+			cancelled: "url('/assets/images/cancelled-bg.png')",
+		},
   		keyframes: {
   			'accordion-down': {
   				from: {

@@ -69,3 +69,9 @@ export const Doctors = [
       name: "Luciano Neves",
     },
   ];
+
+  export const StatusIcon = {
+    agendado: "/assets/icons/check.svg",
+    aguardando: "/assets/icons/pending.svg",
+    cancelado: "/assets/icons/cancelled.svg",
+  }
